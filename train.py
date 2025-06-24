@@ -28,11 +28,49 @@ def load_data(batch_size=64):
 def train(model, train_loader, optimizer, criterion, device):
     """
     Train the model for one epoch.
-    TODO: Implement the training loop
+    Args:
+        model: Neural network model
+        train_loader: DataLoader for training data
+        optimizer: Optimizer for updating weights
+        criterion: Loss function
+        device: Device to train on (cpu/cuda)
+    Returns:
+        float: Average training loss for this epoch
     """
     model.train()
-    # Your training loop implementation here
-    pass
+    running_loss = 0.0
+    total_batches = len(train_loader)
+
+    for batch_idx, (data, target) in enumerate(train_loader):
+        # Move data to device
+        data, target = data.to(device), target.to(device)
+
+        # Zero the gradients
+        optimizer.zero_grad()
+
+        # Forward pass
+        output = model(data)
+
+        # Calculate loss
+        loss = criterion(output, target)
+
+        # Backward pass
+        loss.backward()
+
+        # Update weights
+        optimizer.step()
+
+        # Accumulate loss
+        running_loss += loss.item()
+
+        # Print progress
+        if (batch_idx + 1) % 100 == 0:
+            print(f'Train Batch [{batch_idx + 1}/{total_batches}] Loss: {loss.item():.4f}')
+
+    # Calculate average loss
+    avg_loss = running_loss / total_batches
+    print(f'Training Average Loss: {avg_loss:.4f}')
+    return avg_loss
 
 def test(model, test_loader, criterion, device):
     """
